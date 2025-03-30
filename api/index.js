@@ -28,37 +28,28 @@ app.post('/api/chat', async (req, res) => {
       }
     }
 
-    // Generate random values for better browser simulation
-    const generateRandomHex = (length) => {
-      return Array.from({ length }, () => 
-        Math.floor(Math.random() * 16).toString(16)
-      ).join('');
-    };
-    
-    const vqdHash = `eyJzZXJ2ZXJfaGFzaGVzIjpbIiR7Z2VuZXJhdGVSYW5kb21IZXgoNDQpfT0iLCIke2dlbmVyYXRlUmFuZG9tSGV4KDQ0KX09Il0sImNsaWVudF9oYXNoZXMiOlsiJHtnZW5lcmF0ZVJhbmRvbUhleCg0NCl9PSIsIiR7Z2VuZXJhdGVSYW5kb21IZXgoNDQpfT0iXSwic2lnbmFscyI6e319`;
-
-    // Set up the request to DuckDuckGo with updated headers
+    // Set up the request to DuckDuckGo with exact headers from successful test
     const response = await axios({
       method: 'POST',
       url: 'https://duckduckgo.com/duckchat/v1/chat',
       headers: {
         'accept': 'text/event-stream',
-        'accept-language': 'en-US,en;q=0.9',
+        'accept-language': 'en-US,en-GB;q=0.9,en;q=0.8,ne-NP;q=0.7,ne;q=0.6',
         'content-type': 'application/json',
         'origin': 'https://duckduckgo.com',
         'referer': 'https://duckduckgo.com/',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'sec-ch-ua': '"Not A(Brand";v="99", "Microsoft Edge";v="121", "Chromium";v="121"',
+        'priority': 'u=1, i',
+        'sec-ch-ua': '"Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"',
         'sec-ch-ua-mobile': '?0',
         'sec-ch-ua-platform': '"Windows"',
         'sec-fetch-dest': 'empty',
         'sec-fetch-mode': 'cors',
         'sec-fetch-site': 'same-origin',
-        'x-vqd-4': `4-${Math.floor(Math.random() * 900000000000000) + 100000000000000}`,
-        'x-vqd-hash-1': vqdHash,
-        'x-requested-with': 'XMLHttpRequest',
-        'x-fe-version': `serp_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}_${Math.floor(Math.random() * 900) + 100}_ET-${generateRandomHex(12)}`,
-        'Cookie': `dcs=1; dcm=${Math.floor(Math.random() * 10)}`
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
+        'x-vqd-4': '4-194082620698874678690049097321431039577',
+        'x-vqd-hash-1': 'eyJzZXJ2ZXJfaGFzaGVzIjpbIm9wZVBtbDlpWHVGdkpRZURaaU1hNmpXWDdRamFwelhFOVlLTW9CRnNENlE9IiwiSGdON1hnSXNaTzFrYWNXTHlodlRwQWtJSVFtQUxjNnhSeHBKUDQ5QUlTQT0iXSwiY2xpZW50X2hhc2hlcyI6WyJrZFFzVzJHY3NXR29XUW0zN01QOEp0MHJvMko5d1BkSVhodHhicWRjSGdZPSIsIkdrM1ByMExWRkt0cjJZK3hhc2F4NjlEbEpDOWdKb0lHS0JJU1krckNOMWc9Il0sInNpZ25hbHMiOnt9fQ==',
+        'x-fe-version': 'serp_20250328_151721_ET-d966a891598184d9c455',
+        'Cookie': 'dcs=1; dcm=6'
       },
       data: {
         model: model || "mistralai/Mistral-Small-24B-Instruct-2501",
@@ -66,7 +57,7 @@ app.post('/api/chat', async (req, res) => {
       },
       responseType: 'stream',
       maxRedirects: 5,
-      timeout: 60000
+      timeout: 30000
     });
 
     // Set headers for SSE (Server-Sent Events)
@@ -91,45 +82,12 @@ app.post('/api/chat', async (req, res) => {
       response.data.destroy();
     });
   } catch (error) {
-    console.error('Error proxying request to DuckDuckGo:', error.message);
-    
-    // If we get a 418 status code or other API errors, use fallback
-    if (error.response && (error.response.status === 418 || error.response.status >= 400)) {
-      // Set headers for SSE
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      
-      // Get the last user message
-      const lastUserMessage = messages.filter(msg => msg.role === 'user').pop()?.content || '';
-      
-      // Generate fallback response
-      const fallbackResponse = generateFallbackResponse(lastUserMessage);
-      
-      // Stream the fallback response to mimic SSE
-      const words = fallbackResponse.split(' ');
-      let sentWords = 0;
-      
-      // Send a word every 100ms to mimic streaming
-      const sendInterval = setInterval(() => {
-        if (sentWords < words.length) {
-          const chunk = words.slice(sentWords, sentWords + 3).join(' ') + ' ';
-          res.write(`data: ${JSON.stringify({ content: chunk })}\n\n`);
-          sentWords += 3;
-        } else {
-          res.write('data: [DONE]\n\n');
-          clearInterval(sendInterval);
-          res.end();
-        }
-      }, 100);
-      
-      return;
-    }
+    console.error('Error proxying request to DuckDuckGo');
     
     if (!res.headersSent) {
       res.status(500).json({ 
         error: 'Failed to get response from DuckDuckGo',
-        details: error.message || 'Unknown error'
+        details: error.message
       });
     }
   }
@@ -289,17 +247,17 @@ app.post('/api/blackbox', async (req, res) => {
       timeout: 30000
     });
 
-    // Set headers for SSE
+    // Set headers for SSE (Server-Sent Events)
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    // Process the streaming response
+    // Stream processing for Blackbox
     response.data.on('data', (chunk) => {
       try {
-        // Forward data with proper SSE formatting
+        // Forward the data as-is
         const dataStr = chunk.toString();
-        res.write(`data: ${dataStr}\n\n`);
+        res.write(dataStr);
       } catch (err) {
         console.error('Error processing Blackbox stream chunk:', err);
       }
@@ -307,11 +265,10 @@ app.post('/api/blackbox', async (req, res) => {
 
     // Handle end of stream
     response.data.on('end', () => {
-      res.write('data: [DONE]\n\n');
       res.end();
     });
 
-    // Handle errors
+    // Handle errors and client disconnect
     response.data.on('error', (err) => {
       if (!res.headersSent) {
         res.status(500).json({ error: 'Stream error', details: err.message });
@@ -336,90 +293,10 @@ app.post('/api/blackbox', async (req, res) => {
   }
 });
 
-// API endpoint to handle Qwen chat requests
-app.post('/api/qwen/new-chat', async (req, res) => {
-  try {
-    const { prompt } = req.body;
-    
-    if (!prompt) {
-      return res.status(400).json({ error: 'Invalid request format. Prompt is required.' });
-    }
-
-    // Return a fallback response for Qwen since we're in serverless environment
-    res.json({
-      success: true,
-      data: {
-        chatId: generateId(),
-        response: "I'm currently running in a serverless environment which limits my ability to access Qwen services. Try running this application locally for full functionality."
-      }
-    });
-
-  } catch (error) {
-    console.error('Error handling Qwen request:', error.message);
-    
-    res.status(500).json({ 
-      error: 'Failed to process Qwen request',
-      details: error.message || 'Unknown error'
-    });
-  }
-});
-
-// API endpoint to continue Qwen chat
-app.post('/api/qwen/continue-chat', async (req, res) => {
-  try {
-    const { chatId, prompt } = req.body;
-    
-    if (!chatId || !prompt) {
-      return res.status(400).json({ error: 'Invalid request format. ChatId and prompt are required.' });
-    }
-
-    // Return a fallback response for Qwen
-    res.json({
-      success: true,
-      data: {
-        response: "I'm currently running in a serverless environment which limits my ability to access Qwen services. Try running this application locally for full functionality."
-      }
-    });
-
-  } catch (error) {
-    console.error('Error handling Qwen continuation:', error.message);
-    
-    res.status(500).json({ 
-      error: 'Failed to process Qwen request',
-      details: error.message || 'Unknown error'
-    });
-  }
-});
-
-// Helper function to generate random ID
+// Utility function to generate a random ID
 function generateId() {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  return 'id-' + Math.random().toString(36).substring(2, 9);
 }
 
-// Fallback response function for when API calls fail
-function generateFallbackResponse(message) {
-  // Simple fallback response when the API is unavailable
-  const responses = [
-    "I'm sorry, but I'm having trouble connecting to my knowledge source right now. This is likely because the service is detecting that requests are coming from a server rather than a browser.",
-    "It looks like we're encountering an issue with API access. This is a common limitation when deploying to serverless environments like Vercel.",
-    "The API provider is currently blocking our requests as they can detect server-side calls. You might want to try using the app locally instead.",
-    "I apologize, but I can't process your request right now due to API restrictions. The providers often block requests that don't come from browsers."
-  ];
-  
-  // Get a fallback response with some context about the user's query
-  const response = responses[Math.floor(Math.random() * responses.length)];
-  
-  // Add some context for common query types
-  let context = "";
-  const messageText = message.toLowerCase();
-  
-  if (messageText.includes("help") || messageText.includes("how to")) {
-    context = " If you're looking for help, consider trying the application locally or using a different AI service.";
-  } else if (messageText.includes("why") || messageText.includes("because")) {
-    context = " The API providers implement these restrictions to prevent abuse and unauthorized access.";
-  }
-  
-  return response + context;
-}
-
+// For Vercel serverless functions, export the app
 module.exports = app; 
