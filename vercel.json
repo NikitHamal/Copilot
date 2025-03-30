@@ -21,11 +21,21 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/index.js"
+      "dest": "/api/index.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept",
+        "cache-control": "public, max-age=0, must-revalidate"
+      }
     },
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "/$1",
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate"
+      }
     }
-  ]
+  ],
+  "regions": ["iad1"]
 } 
