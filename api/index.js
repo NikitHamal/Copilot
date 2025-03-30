@@ -336,6 +336,61 @@ app.post('/api/blackbox', async (req, res) => {
   }
 });
 
+// API endpoint to handle Qwen chat requests
+app.post('/api/qwen/new-chat', async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    
+    if (!prompt) {
+      return res.status(400).json({ error: 'Invalid request format. Prompt is required.' });
+    }
+
+    // Return a fallback response for Qwen since we're in serverless environment
+    res.json({
+      success: true,
+      data: {
+        chatId: generateId(),
+        response: "I'm currently running in a serverless environment which limits my ability to access Qwen services. Try running this application locally for full functionality."
+      }
+    });
+
+  } catch (error) {
+    console.error('Error handling Qwen request:', error.message);
+    
+    res.status(500).json({ 
+      error: 'Failed to process Qwen request',
+      details: error.message || 'Unknown error'
+    });
+  }
+});
+
+// API endpoint to continue Qwen chat
+app.post('/api/qwen/continue-chat', async (req, res) => {
+  try {
+    const { chatId, prompt } = req.body;
+    
+    if (!chatId || !prompt) {
+      return res.status(400).json({ error: 'Invalid request format. ChatId and prompt are required.' });
+    }
+
+    // Return a fallback response for Qwen
+    res.json({
+      success: true,
+      data: {
+        response: "I'm currently running in a serverless environment which limits my ability to access Qwen services. Try running this application locally for full functionality."
+      }
+    });
+
+  } catch (error) {
+    console.error('Error handling Qwen continuation:', error.message);
+    
+    res.status(500).json({ 
+      error: 'Failed to process Qwen request',
+      details: error.message || 'Unknown error'
+    });
+  }
+});
+
 // Helper function to generate random ID
 function generateId() {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
