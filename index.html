@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stormy</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github.min.css">
+    <style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 300,
+          'GRAD' 0,
+          'opsz' 24;
+          font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="material-symbols-outlined">smart_toy</span>
+                    <span>Stormy</span>
+                </div>
+                <button id="new-chat-btn" class="new-chat-button">
+                    <span class="material-symbols-outlined">add</span>
+                    New Chat
+                </button>
+            </div>
+            <div class="chat-history" id="chat-history">
+                <!-- Chat history will be populated here -->
+            </div>
+            <div class="sidebar-footer">
+                <button id="settings-btn" class="settings-button">
+                    <span class="material-symbols-outlined">settings</span>
+                    Settings
+                </button>
+                <button id="delete-all-chats-btn" class="delete-all-chats-button">
+                    <span class="material-symbols-outlined">delete_sweep</span>
+                    Delete All Chats
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="current-chat-title" id="current-chat-title">New Chat</div>
+                <div class="chat-controls">
+                    <div class="model-selector-wrapper">
+                        <div class="custom-model-selector">
+                            <span id="selected-model">Mistral Small 3</span>
+                            <span class="material-symbols-outlined dropdown-icon">expand_more</span>
+                            <div class="model-dropdown">
+                                <div class="model-option" data-value="mistralai/Mistral-Small-24B-Instruct-2501">Mistral Small 3</div>
+                                <div class="model-option" data-value="o3-mini">o3-mini</div>
+                                <div class="model-option" data-value="claude-3-haiku-20240307">Claude 3 Haiku</div>
+                                <div class="model-option" data-value="meta-llama/Llama-3.3-70B-Instruct-Turbo">Llama-3.3 70B</div>
+                                <div class="model-option" data-value="gpt-4o-mini">GPT-4o-mini</div>
+                                <div class="model-option" data-value="grok-latest">Grok 2 <span class="message-counter grok2-counter"></span></div>
+                                <div class="model-option" data-value="grok-next">Grok 3 <span class="message-counter grok3-counter"></span></div>
+                                <div class="model-option" data-value="blackbox-deepseek-r1">DeepSeek R1</div>
+                                <div class="model-option" data-value="qwen-max-latest">Qwen Max</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="stream-toggle" class="control-button active" title="Toggle streaming">
+                        <span class="material-symbols-outlined">bolt</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="messages-container">
+                <div class="welcome-message">
+                    <h1>Stormy</h1>
+                    <p>Ask me anything!</p>
+                </div>
+                <!-- Messages will be populated here -->
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="input-wrapper">
+                    <div class="input-options">
+                        <button id="web-search-toggle" class="option-button active" title="Toggle web search">
+                            <span class="material-symbols-outlined">search</span>
+                        </button>
+                        <button id="thinking-toggle" class="option-button active" title="Toggle thinking mode">
+                            <span class="material-symbols-outlined">psychology</span>
+                        </button>
+                    </div>
+                    <textarea id="message-input" placeholder="Type your message here..." rows="1"></textarea>
+                    <button id="send-button" class="send-button">
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button id="close-settings" class="close-button">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <div class="setting-label">Dark Mode</div>
+                    <label class="switch">
+                        <input type="checkbox" id="dark-mode-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates for dynamic content -->
+    <template id="message-template">
+        <div class="message">
+            <div class="message-avatar">
+                <span class="material-symbols-outlined avatar-icon"></span>
+            </div>
+            <div class="message-content">
+                <div class="query-actions"></div>
+                <div class="results-summary"></div>
+                <div class="message-text"></div>
+                <div class="message-sources"></div>
+                <div class="message-images"></div>
+            </div>
+        </div>
+    </template>
+
+    <template id="source-template">
+        <div class="source">
+            <span class="material-symbols-outlined">link</span>
+            <a class="source-link" target="_blank" href=""></a>
+        </div>
+    </template>
+
+    <template id="image-template">
+        <div class="generated-image">
+            <img class="ai-image" src="" alt="AI Generated Image">
+            <div class="image-prompt">Generated by AI</div>
+        </div>
+    </template>
+
+    <template id="result-count-template">
+        <div class="result-count">
+            <span class="material-symbols-outlined avatar-icon"></span>
+            <span class="count-text"></span>
+        </div>
+    </template>
+
+    <template id="chat-history-item-template">
+        <div class="history-item">
+            <div class="history-item-title"></div>
+            <div class="history-item-actions">
+                <button class="delete-chat-btn">
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Search Results Modal -->
+    <div id="search-results-modal" class="search-results-modal">
+        <div class="search-results-content">
+            <div class="search-results-header">
+                <h2>Search Results</h2>
+                <button id="close-search-results" class="close-button">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="search-results-container" class="search-results-container"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+    <script src="script.js" type="module"></script>
+</body>
+</html> 
