@@ -104,30 +104,38 @@ async function getQwenChatCompletion(message, previousMessages = [], isWebSearch
             buffer += chunk;
             
             // Split by newlines and process complete lines
+            // Qwen uses \n\n as delimiter
             const lines = buffer.split('\n\n');
-            // Keep the last line in the buffer as it might be incomplete
+            // Keep the last part in the buffer as it might be incomplete
             buffer = lines.pop() || '';
             
             for (const line of lines) {
                 if (line.startsWith('data: ')) {
-                    // Skip [DONE] message
-                    if (line === 'data: [DONE]') continue;
+                    const jsonDataString = line.substring(6).trim();
+                    // Skip empty data messages and [DONE]
+                    if (jsonDataString === '' || jsonDataString === '[DONE]') continue;
                     
                     try {
-                        const data = JSON.parse(line.substring(6));
+                        const data = JSON.parse(jsonDataString);
                         
-                        // Extract content from the response
+                        // Extract content ONLY if the expected structure exists
                         if (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) {
                             const content = data.choices[0].delta.content;
                             fullResponse += content;
                             
+                            // Call onChunk only if streaming is enabled and callback provided
                             if (isStreaming && typeof onChunk === 'function') {
-                                // Call the callback with the current text
                                 onChunk(fullResponse);
                             }
+                        } else {
+                            // Log unexpected structures, but don't stop accumulation
+                            // These might be search status messages etc. when web search is on
+                            console.log('Received non-standard data chunk from Qwen:', data);
                         }
                     } catch (e) {
-                        console.error('Error parsing JSON from Qwen stream:', e);
+                        // Log parsing errors but continue - might be plain text updates or malformed JSON chunks
+                        console.warn('Error parsing JSON from Qwen stream chunk, skipping chunk:', e);
+                        console.warn('Skipped chunk content:', jsonDataString);
                     }
                 }
             }

@@ -1,0 +1,584 @@
+/* Planning Styles */
+:root {
+    --planning-header-bg: rgba(0, 0, 0, 0.02);
+    --planning-border: var(--border-color);
+    --planning-text: var(--text-color);
+    --planning-secondary: var(--text-secondary);
+    --planning-accent: var(--accent-color);
+    --planning-icon-color: var(--accent-color);
+    --planning-button-hover: var(--hover-color);
+    --planning-step-bg: var(--message-bg-user);
+    --planning-step-completed: rgba(76, 175, 80, 0.1);
+    --planning-step-executing: rgba(33, 150, 243, 0.1);
+    --planning-step-border: var(--border-color);
+    --planning-transition: all 0.3s ease;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] {
+    --planning-header-bg: rgba(255, 255, 255, 0.03);
+    --planning-step-completed: rgba(76, 175, 80, 0.2);
+    --planning-step-executing: rgba(33, 150, 243, 0.2);
+}
+
+/* Main planning section container */
+.planning-section {
+    margin: 16px 0;
+    border: 1px solid var(--planning-border);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background-color: var(--message-bg-ai);
+    transition: var(--planning-transition);
+    max-width: 100%;
+}
+
+/* Planning header */
+.planning-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background-color: var(--planning-header-bg);
+    border-bottom: 1px solid var(--planning-border);
+}
+
+.planning-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: var(--planning-text);
+}
+
+.planning-icon {
+    color: var(--planning-icon-color);
+    font-size: 18px;
+}
+
+/* Thinking animation text */
+.planning-thinking-text {
+    color: var(--planning-secondary);
+    font-size: 14px;
+    animation: fadeInOut 2s infinite;
+}
+
+/* Planning content area */
+.planning-content {
+    padding: 16px;
+}
+
+/* Planning steps list */
+.planning-steps {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Individual planning step */
+.planning-step {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    background-color: var(--planning-step-bg);
+    border: 1px solid var(--planning-step-border);
+    border-radius: var(--border-radius);
+    transition: var(--planning-transition);
+    position: relative;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.planning-step:last-child {
+    margin-bottom: 0;
+}
+
+/* Completed step styling */
+.planning-step.completed {
+    background-color: var(--planning-step-completed);
+    border-color: rgba(76, 175, 80, 0.3);
+}
+
+.planning-step.completed::before {
+    content: 'check_circle';
+    font-family: 'Material Symbols Outlined';
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #4CAF50;
+    font-size: 16px;
+}
+
+/* Executing step styling */
+.planning-step.executing {
+    background-color: var(--planning-step-executing);
+    border-color: rgba(33, 150, 243, 0.3);
+    position: relative;
+}
+
+.planning-step.executing::before {
+    content: 'pending';
+    font-family: 'Material Symbols Outlined';
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #2196F3;
+    font-size: 16px;
+}
+
+/* Step content */
+.step-content {
+    flex: 1;
+    line-height: 1.5;
+}
+
+/* Step buttons */
+.step-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0.3;
+    transition: opacity 0.2s;
+}
+
+.planning-step:hover .step-actions {
+    opacity: 1;
+}
+
+.step-edit-btn,
+.step-delete-btn,
+.step-save-btn,
+.step-cancel-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background-color 0.2s;
+    color: var(--planning-secondary);
+}
+
+.step-edit-btn:hover,
+.step-delete-btn:hover,
+.step-save-btn:hover,
+.step-cancel-btn:hover {
+    background-color: var(--planning-button-hover);
+}
+
+.step-delete-btn:hover {
+    color: #f44336;
+}
+
+.step-save-btn:hover {
+    color: #4CAF50;
+}
+
+/* Step edit field */
+.step-edit-field {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--planning-accent);
+    border-radius: var(--border-radius);
+    font-family: var(--font-main);
+    font-size: 14px;
+    resize: vertical;
+    min-height: 60px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.step-edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* Planning controls */
+.planning-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--planning-border);
+}
+
+.planning-edit-btn,
+.planning-approve-btn,
+.planning-add-step-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 18px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--planning-transition);
+    border: 1px solid var(--planning-border);
+}
+
+.planning-edit-btn {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.planning-add-step-btn {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.planning-approve-btn {
+    background-color: var(--planning-accent);
+    color: white;
+    border-color: var(--planning-accent);
+}
+
+.planning-edit-btn:hover,
+.planning-add-step-btn:hover {
+    background-color: var(--planning-button-hover);
+}
+
+.planning-approve-btn:hover {
+    background-color: var(--accent-color);
+    opacity: 0.9;
+}
+
+.planning-edit-btn .material-symbols-outlined,
+.planning-approve-btn .material-symbols-outlined,
+.planning-add-step-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Execution status message */
+.planning-status {
+    padding: 10px 16px;
+    background-color: rgba(33, 150, 243, 0.1);
+    color: var(--text-color);
+    border-top: 1px solid rgba(33, 150, 243, 0.2);
+    font-weight: 500;
+    text-align: center;
+    transition: opacity 0.5s;
+}
+
+/* Responsive styles */
+@media (max-width: 580px) {
+    .planning-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .planning-edit-btn,
+    .planning-approve-btn,
+    .planning-add-step-btn {
+        justify-content: center;
+    }
+    
+    .planning-step {
+        flex-direction: column;
+    }
+    
+    .step-actions {
+        align-self: flex-end;
+        margin-top: 8px;
+    }
+}
+
+/* Execution results styles */
+.execution-results {
+    margin-top: 16px;
+    border-top: 1px dashed var(--planning-border);
+    padding-top: 16px;
+}
+
+.step-result {
+    margin-bottom: 16px;
+    padding: 16px;
+    background-color: var(--message-bg-user);
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--planning-accent);
+}
+
+.step-result h4 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-weight: 500;
+    color: var(--planning-accent);
+}
+
+.result-content {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.result-content pre {
+    margin: 12px 0;
+    padding: 12px;
+    border-radius: var(--border-radius);
+    background-color: rgba(0, 0, 0, 0.03);
+    overflow-x: auto;
+}
+
+/* Animation for streaming content */
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.streaming-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background-color: var(--text-color);
+    margin-left: 2px;
+    animation: blink 1s infinite;
+}
+
+/* Research Container Styles */
+.research-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 16px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background-color: var(--message-bg-ai);
+}
+
+.research-content {
+    padding: 16px;
+    margin: 16px 0;
+    background-color: var(--background-color);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    line-height: 1.6;
+    overflow-x: auto;
+}
+
+.research-content h1,
+.research-content h2,
+.research-content h3,
+.research-content h4,
+.research-content h5,
+.research-content h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    color: var(--text-color);
+}
+
+.research-content h1 {
+    font-size: 1.8em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.3em;
+}
+
+.research-content h2 {
+    font-size: 1.5em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.3em;
+}
+
+.research-content p {
+    margin: 1em 0;
+}
+
+.research-content ul,
+.research-content ol {
+    margin: 1em 0;
+    padding-left: 2em;
+}
+
+.research-content blockquote {
+    border-left: 4px solid var(--accent-color);
+    padding-left: 1em;
+    margin: 1em 0;
+    color: var(--text-secondary);
+}
+
+.research-content pre {
+    background-color: var(--code-bg);
+    padding: 1em;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.research-content code {
+    background-color: var(--code-bg);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+}
+
+.research-status {
+    padding: 10px 16px;
+    font-size: 14px;
+    text-align: center;
+    background-color: rgba(33, 150, 243, 0.1);
+    color: var(--text-color);
+    border-top: 1px solid rgba(33, 150, 243, 0.2);
+    font-weight: 500;
+}
+
+.research-tools {
+    margin-top: 16px;
+    padding: 16px;
+    background-color: var(--planning-header-bg);
+    border: 1px solid var(--planning-border);
+    border-radius: var(--border-radius);
+}
+
+.tools-header {
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--planning-text);
+    font-size: 16px;
+}
+
+.tools-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tool-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 18px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.tool-btn:hover {
+    background-color: var(--hover-color);
+}
+
+.tool-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.download-pdf-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 18px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.download-pdf-button:hover {
+    opacity: 0.9;
+}
+
+.download-pdf-button .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.research-error {
+    padding: 16px;
+    background-color: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+    border-radius: var(--border-radius);
+    margin: 16px 0;
+    text-align: center;
+}
+
+/* Modal Styles */
+.translate-modal,
+.deep-research-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.translate-modal-content,
+.deep-research-modal-content {
+    background-color: var(--background-color);
+    padding: 24px;
+    border-radius: var(--border-radius);
+    max-width: 400px;
+    width: 90%;
+}
+
+.translate-modal-content h3,
+.deep-research-modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: var(--text-color);
+}
+
+#language-select,
+#section-select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.translate-buttons,
+.deep-research-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.translate-buttons button,
+.deep-research-buttons button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+}
+
+#cancel-translate,
+#cancel-deep-research {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+#confirm-translate,
+#confirm-deep-research {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .tools-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .tool-btn,
+    .download-pdf-button {
+        justify-content: center;
+    }
+} 

@@ -2,8 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const path = require('path');
+const markdownpdf = require('markdown-pdf');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -202,7 +203,7 @@ app.post('/api/grok', async (req, res) => {
 // API endpoint to proxy requests to Blackbox AI
 app.post('/api/blackbox', async (req, res) => {
   try {
-    const { messages, agentMode } = req.body;
+    const { messages, agentMode, mode } = req.body;
     
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Invalid request format. Messages array is required.' });
@@ -212,8 +213,74 @@ app.post('/api/blackbox', async (req, res) => {
     const formattedMessages = messages.map((msg, index) => ({
       role: msg.role,
       content: msg.content,
-      id: generateId()
+      id: msg.id || generateId()
     }));
+
+    // Build the request body based on whether it's a continue request or regular chat
+    const requestBody = {
+      messages: formattedMessages,
+      agentMode: agentMode || {
+        name: "DeepSeek-R1",
+        id: "deepseek-reasoner",
+        mode: true
+      },
+      id: generateId(),
+      previewToken: null,
+      userId: null,
+      codeModelMode: true,
+      trendingAgentMode: {},
+      isMicMode: false,
+      userSystemPrompt: null,
+      maxTokens: 1024,
+      playgroundTopP: null,
+      playgroundTemperature: null,
+      isChromeExt: false,
+      githubToken: "",
+      clickedAnswer2: false,
+      clickedAnswer3: false,
+      clickedForceWebSearch: false,
+      visitFromDelta: false,
+      isMemoryEnabled: false,
+      mobileClient: false,
+      userSelectedModel: "DeepSeek-R1",
+      validated: "00f37b34-a166-4efb-bce5-1312d87f2f94",
+      imageGenerationMode: false,
+      webSearchModePrompt: false,
+      deepSearchMode: false,
+      domains: null,
+      vscodeClient: false,
+      codeInterpreterMode: false,
+      customProfile: {
+        name: "",
+        occupation: "",
+        traits: [],
+        additionalInfo: "",
+        enableNewChats: false
+      },
+      session: {
+        user: {
+          name: "Nikit Hamal",
+          email: "iamnikithamal@gmail.com",
+          image: "https://lh3.googleusercontent.com/a/ACg8ocLFjMoNLrecmhMCIHrrKgHbyFTdqjL3ML9nNWDfC37lCwoYdihg=s96-c",
+          id: "111484894962604179735"
+        },
+        expires: "2025-04-28T19:23:22.222Z"
+      },
+      isPremium: false,
+      subscriptionCache: {
+        status: "FREE",
+        expiryTimestamp: null,
+        lastChecked: 1743271985360,
+        isTrialSubscription: false
+      },
+      beastMode: false,
+      reasoningMode: false
+    };
+
+    // Add continuation mode if specified
+    if (mode === "continue") {
+      requestBody.mode = "continue";
+    }
 
     // Set up the request to Blackbox AI with required headers
     const response = await axios({
@@ -235,65 +302,7 @@ app.post('/api/blackbox', async (req, res) => {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
         'Cookie': 'sessionId=fd566283-2eb6-4955-be11-1b7cfa7bfe9f; intercom-id-x55eda6t=048c6c4f-914e-4970-9b8b-9a1cfc0b406c; intercom-device-id-x55eda6t=08680615-b734-4962-b6e4-98da23b045b6; __Host-authjs.csrf-token=a6295c9302dd3f46279404914928e4e7805b5f82174cffa908b4a9f1a31475b2%7C50c9ca916eedbdb25e4ac16a56d5c72053222f4db0823770d6dfbd806c02c13c; __Secure-authjs.callback-url=https%3A%2F%2Fwww.blackbox.ai; render_app_version_affinity=dep-cvk3hthr0fns739mkfh0; __Secure-authjs.session-token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..DddMr5OnF_zF68XH.QOMCRCL-UJEB26DuDtN4roIIpqaV-fgqNnUUlMS-8_LiZQ4EDqbjonSUDsFIV_8vtsRlG4ZyQjSXhn6aRUAB6DIPE3XzMk3xqtkIz9D1rdXS2cqi5HKso1WCYZhmSNB3KtAKyD_Ss3S7QEKomCkcWPe73fyeUTrpgSwzSn0bUojCBVelYI86gmjcE7Eo21J7CJ3DPJESHvLzlHdB1w3Y6nsTm-aDHCZkAz4usF7VPUwIJaTWxq57SpMi75aTfet5mk-2b5evQiuJHXFwyQ6aqlT1nxuIQdZFdLGq8LmDiGNXi3Z6400QI6XZgGddrUukvrq7AjBcY80qr0LfyXsOj4efURnPjWbmGYAgUmkt0bCp67Rr5OZFlDv3kr-MzI6JJ_-x9Fgv-3_DCAOE_CltXZ4RCgM3XTPO0E9vFrYMZ0ihjjcbAiGlFWt72wy0njAHvd_mUlV2MH2yhM1b3B5QACJ10M-4ftKMsa5ZBt3afx5fJl9UJ7BZtZ0p-LhURgbi5Qln87jGQQDTw33fLu8hKrbVb0BXPANEaPOSIhh7.5nEiRCy7oR5X5Vt2wREcag; intercom-session-x55eda6t=aWRIeXlBalQzNEF4aEZ3SWxPM1FpR2QvemcrTy9yOE9JNWtGeGthaEdiam9OMzhyUDhhLzAyUUl3ZGN4WjNjSnRHSHhMNlhyL2tUQllYcDJGWWdEaElabE8zQW50S3d0dm85aHgxOUI4L1k9LS1yVmE0ZmNoUlExTHRNZzRCcGhqQ0xnPT0=--47092c07ac1e7ac65bdc53f87d8bb8026a9571ad'
       },
-      data: {
-        messages: formattedMessages,
-        agentMode: {
-          name: "DeepSeek-R1",
-          id: "deepseek-reasoner",
-          mode: true
-        },
-        id: generateId(),
-        previewToken: null,
-        userId: null,
-        codeModelMode: true,
-        trendingAgentMode: {},
-        isMicMode: false,
-        userSystemPrompt: null,
-        maxTokens: 1024,
-        playgroundTopP: null,
-        playgroundTemperature: null,
-        isChromeExt: false,
-        githubToken: "",
-        clickedAnswer2: false,
-        clickedAnswer3: false,
-        clickedForceWebSearch: false,
-        visitFromDelta: false,
-        isMemoryEnabled: false,
-        mobileClient: false,
-        userSelectedModel: "DeepSeek-R1",
-        validated: "00f37b34-a166-4efb-bce5-1312d87f2f94",
-        imageGenerationMode: false,
-        webSearchModePrompt: false,
-        deepSearchMode: false,
-        domains: null,
-        vscodeClient: false,
-        codeInterpreterMode: false,
-        customProfile: {
-          name: "",
-          occupation: "",
-          traits: [],
-          additionalInfo: "",
-          enableNewChats: false
-        },
-        session: {
-          user: {
-            name: "Nikit Hamal",
-            email: "iamnikithamal@gmail.com",
-            image: "https://lh3.googleusercontent.com/a/ACg8ocLFjMoNLrecmhMCIHrrKgHbyFTdqjL3ML9nNWDfC37lCwoYdihg=s96-c",
-            id: "111484894962604179735"
-          },
-          expires: "2025-04-28T19:23:22.222Z"
-        },
-        isPremium: false,
-        subscriptionCache: {
-          status: "FREE",
-          expiryTimestamp: null,
-          lastChecked: 1743271985360,
-          isTrialSubscription: false
-        },
-        beastMode: false,
-        reasoningMode: false
-      },
+      data: requestBody,
       responseType: 'stream',
       maxRedirects: 5,
       timeout: 30000
@@ -308,12 +317,26 @@ app.post('/api/blackbox', async (req, res) => {
     response.data.on('data', (chunk) => {
       try {
         const dataStr = chunk.toString();
-        console.log('Blackbox raw response:', dataStr); // Log for debugging
+        console.log('Blackbox raw response chunk:', dataStr); // Enhanced logging
         
         // Handle Blackbox response format directly without parsing JSON
         // Just forward the raw data properly formatted
         if (dataStr.trim()) {
-          res.write(`data: ${dataStr}\n\n`);
+          // Make sure we're sending properly formatted SSE data
+          // Ensure each line is properly formatted as an SSE event
+          const lines = dataStr.split('\n').filter(line => line.trim());
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              // Already has data: prefix, forward as is
+              res.write(line + '\n\n');
+              console.log('Forwarding with existing prefix:', line);
+            } else {
+              // Add data: prefix
+              res.write(`data: ${line}\n\n`);
+              console.log('Forwarding with added prefix:', `data: ${line}`);
+            }
+          }
         }
       } catch (err) {
         console.error('Error processing Blackbox stream chunk:', err);
@@ -627,6 +650,51 @@ app.post('/api/qwen/chat-completions', async (req, res) => {
       res.status(500).json({
         error: 'Failed to get response from Qwen chat completions',
         details: error.message
+      });
+    }
+  }
+});
+
+// API endpoint to generate PDF from markdown
+app.post('/api/generate-pdf', (req, res) => {
+  const { markdownContent, filename = 'research_report.pdf' } = req.body;
+
+  if (!markdownContent) {
+    return res.status(400).json({ error: 'Markdown content is required.' });
+  }
+
+  try {
+    const pdfPath = path.join(__dirname, filename); // Save temporarily on server
+    const cssPath = path.join(__dirname, 'pdf-styles.css'); // Path to the CSS file
+
+    // Configure markdown-pdf to use the CSS file
+    markdownpdf({ cssPath: cssPath }).from.string(markdownContent).to(pdfPath, function () {
+      console.log("PDF Created with custom styles:", pdfPath);
+      
+      // Set headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      
+      // Send the file
+      res.sendFile(pdfPath, (err) => {
+        if (err) {
+          console.error('Error sending PDF:', err);
+          if (!res.headersSent) {
+            res.status(500).json({ error: 'Error sending PDF file', details: err.message });
+          }
+        } else {
+          // Optionally delete the temporary file after sending
+          // fs.unlinkSync(pdfPath);
+          console.log('PDF sent successfully');
+        }
+      });
+    });
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        error: 'Failed to generate PDF',
+        details: error.message 
       });
     }
   }

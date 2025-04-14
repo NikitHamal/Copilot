@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stormy</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="planning-styles.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github.min.css">
     <style>
@@ -56,18 +57,11 @@
                 <div class="chat-controls">
                     <div class="model-selector-wrapper">
                         <div class="custom-model-selector">
-                            <span id="selected-model">Mistral Small 3</span>
+                            <span id="selected-model">Qwen Max</span>
                             <span class="material-symbols-outlined dropdown-icon">expand_more</span>
                             <div class="model-dropdown">
-                                <div class="model-option" data-value="mistralai/Mistral-Small-24B-Instruct-2501">Mistral Small 3</div>
-                                <div class="model-option" data-value="o3-mini">o3-mini</div>
-                                <div class="model-option" data-value="claude-3-haiku-20240307">Claude 3 Haiku</div>
-                                <div class="model-option" data-value="meta-llama/Llama-3.3-70B-Instruct-Turbo">Llama-3.3 70B</div>
-                                <div class="model-option" data-value="gpt-4o-mini">GPT-4o-mini</div>
-                                <div class="model-option" data-value="grok-latest">Grok 2 <span class="message-counter grok2-counter"></span></div>
-                                <div class="model-option" data-value="grok-next">Grok 3 <span class="message-counter grok3-counter"></span></div>
-                                <div class="model-option" data-value="blackbox-deepseek-r1">DeepSeek R1</div>
                                 <div class="model-option" data-value="qwen-max-latest">Qwen Max</div>
+                                <div class="model-option" data-value="blackbox-deepseek-r1">DeepSeek R1</div>
                             </div>
                         </div>
                     </div>
@@ -81,6 +75,13 @@
                 <div class="welcome-message">
                     <h1>Stormy</h1>
                     <p>Ask me anything!</p>
+                    <div class="command-help">
+                        <p>Available commands:</p>
+                        <ul>
+                            <li><code>/research [topic] pages=[number]</code> - Generate a comprehensive research report</li>
+                            <li><code>/planning [topic]</code> - Create an actionable plan with steps</li>
+                        </ul>
+                    </div>
                 </div>
                 <!-- Messages will be populated here -->
             </div>
@@ -186,8 +187,16 @@
         </div>
     </div>
 
+    <!-- Load external scripts -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/highlight.min.js"></script>
+    <!-- Add languages support for highlight.js -->
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/languages/javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/languages/python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/languages/bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/languages/json.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/languages/html.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/languages/css.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
     <script src="script.js" type="module"></script>
 </body>

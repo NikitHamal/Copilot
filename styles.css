@@ -332,22 +332,64 @@ body {
     width: 100%;
 }
 
+/* Welcome Message */
 .welcome-message {
     text-align: center;
-    margin: auto;
-    max-width: 600px;
+    padding: 4rem 2rem;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .welcome-message h1 {
-    margin-bottom: 16px;
-    color: var(--text-color);
-    font-size: 22px;
-    font-weight: 500;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, #636cff, #aa5cff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
 }
 
 .welcome-message p {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+}
+
+.command-help {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.command-help p {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.command-help ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.command-help li {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
     color: var(--text-secondary);
-    font-size: 15px;
+}
+
+.command-help code {
+    background-color: var(--bg-tertiary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Roboto Mono', monospace;
+    color: var(--accent-color);
 }
 
 .message {
@@ -1394,4 +1436,48 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+/* Message actions section (like continue button) */
+.message-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+    padding-right: 15px;
+}
+
+.continue-button {
+    display: flex;
+    align-items: center;
+    background-color: var(--accent-color);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.continue-button:hover {
+    background-color: var(--accent-hover-color);
+}
+
+.continue-button:disabled {
+    background-color: #888;
+    cursor: not-allowed;
+}
+
+.continue-button .material-symbols-outlined {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+/* Dark mode adjustments for continue button */
+.dark-mode .continue-button {
+    background-color: var(--dark-accent-color);
+}
+
+.dark-mode .continue-button:hover {
+    background-color: var(--dark-accent-hover-color);
 } 
